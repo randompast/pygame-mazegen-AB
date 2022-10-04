@@ -8,10 +8,17 @@ class mazegen():
         self.visited = self.make_matrix(size, size, 0)
         self.vwalls = self.make_matrix(size+1, size+1, 1)
         self.hwalls = self.make_matrix(size+1, size+1, 1)
-        self.AldousBroder()
+        self.current_point = self.rand_pos()
+        self.visit(self.current_point)
+        # self.AldousBroder()
 
     def instantiateWallMaze(self, surf, scale):
         size = self.size
+        for i in range(size):
+            for j in range(size):
+                color = (0,255,0) if self.visited[i][j] == 1 else (0,0,255)
+                pygame.draw.rect(surf, color, [i*scale + 50, j*scale + 50, scale, scale])
+        pygame.draw.rect(surf, (255,255,0), [self.current_point[0]*scale + 50, self.current_point[1]*scale + 50, scale, scale])
         for i in range(size+1):
             for j in range(size+1):
                 s = scale/2.0
@@ -21,8 +28,7 @@ class mazegen():
                     pygame.draw.rect(surf, (255,255,255), [i*scale + 50, j*scale + 50, scale/10, scale], scale//4)
 
     def AldousBroder(self):
-        p = self.rand_pos()
-        self.visit(p)
+        p = self.current_point
 
         while(self.nvisited < self.size**2):
             next_point = self.pickNeighbor(p)
@@ -30,6 +36,14 @@ class mazegen():
                 self.visit(next_point)
                 self.removeWall(p, next_point)
             p = next_point
+
+    def AldousBroder_step(self):
+        if (self.nvisited < self.size**2):
+            next_point = self.pickNeighbor(self.current_point)
+            if ( self.visited[next_point[0]][next_point[1]] == 0 ):
+                self.visit(next_point)
+                self.removeWall(self.current_point, next_point)
+            self.current_point = next_point
 
     def removeWall(self, p1, p2):
         dx = p2[0] - p1[0]
