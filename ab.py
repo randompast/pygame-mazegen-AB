@@ -109,7 +109,7 @@ def performance_characteristics():
 
     results = []
     with conf.ProcessPoolExecutor() as executor:
-        for i in range(2, 15):
+        for i in range(2, 41):
             f = executor.submit(avg_perf, i, 10)
             results.append(f)
         results = [r.result() for r in results]
@@ -118,22 +118,32 @@ def performance_characteristics():
 
 def plot_performance(r):
     from matplotlib import pyplot as plt
+    fig,ax = plt.subplots()
+
     for i in r:
         steps = i[0]
         size = i[1]
         t = i[2]
-        plt.scatter( [size]*len(steps), steps )
+        ax.scatter( [size]*len(steps), steps )
     x = range(2,r[-1][1]+1)
     y = [ sum(i[0]) / len(i[0]) for i in r ]
 
-    plt.title('Aldous Broder Performance ~ O(n^3.1)')
-    plt.plot( x, [ i**3.4 for i in x], color='blue', label='s^3.4' )
-    plt.plot( x, [ i**3.1 for i in x], color='blue', label='s^3.1' )
-    plt.plot( x, [ i**2.7 for i in x], color='blue', label='s^2.7' )
-    plt.plot( x, y, color='green', label='avg' )
-    plt.xlabel("s x s grid")
-    plt.ylabel("# of steps to finish")
-    plt.legend()
+    plt.title('Aldous Broder Performance ~ s^3')
+    ax.plot( x, [ i**3 for i in x], color='blue', label='s^3' )
+    ax.plot( x, y, color='green', label='avg' )
+    ax.set_ylabel("# of steps to finish")
+    ax.set_xlabel("s x s grid")
+
+    # Timing is rough due to concurrency
+    ax2=ax.twinx()
+    ax2.plot( x, [ i[2]/len(i[0]) for i in r], color='orange', label='time' )
+    ax2.set_ylabel("# of seconds")
+
+    txt='Timing is rough due to concurrency'
+    plt.figtext(0.5, 0.01, txt, wrap=True, horizontalalignment='center', fontsize=10)
+
+    ax.legend(loc='upper left')
+    ax2.legend(loc='upper right')
     plt.grid()
     plt.show()
 
