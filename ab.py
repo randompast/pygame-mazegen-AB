@@ -16,18 +16,23 @@ class mazegen():
 
     def instantiateWallMaze(self, surf, scale):
         size = self.size
+        off = 50
         for i in range(size):
             for j in range(size):
                 color = (0,255,0) if self.visited[i][j] == 1 else (0,0,255)
-                pygame.draw.rect(surf, color, [i*scale + 50, j*scale + 50, scale, scale])
-        pygame.draw.rect(surf, (255,255,0), [self.current_point[0]*scale + 50, self.current_point[1]*scale + 50, scale, scale])
+                pygame.draw.rect(surf, color, [i*scale + off, j*scale + off, scale, scale])
+        pygame.draw.rect(surf, (255,255,0)
+            , [self.current_point[0]*scale + scale/10 + off
+            , self.current_point[1]*scale + scale/10 + off
+            , scale - scale/10
+            , scale - scale/10])
         for i in range(size+1):
             for j in range(size+1):
                 s = scale/2.0
                 if( self.hwalls[i][j] and i < size):
-                    pygame.draw.rect(surf, (255,255,255), [i*scale + 50, j*scale + 50, scale, scale/10], scale//4)
+                    pygame.draw.rect(surf, (255,255,255), [i*scale + off, j*scale + off, scale+scale/10, scale/10], scale//4)
                 if( self.vwalls[i][j] and j < size ):
-                    pygame.draw.rect(surf, (255,255,255), [i*scale + 50, j*scale + 50, scale/10, scale], scale//4)
+                    pygame.draw.rect(surf, (255,255,255), [i*scale + off, j*scale + off, scale/10, scale+scale/10], scale//4)
 
     def AldousBroder(self):
         while(self.nvisited < self.size**2):
@@ -41,7 +46,6 @@ class mazegen():
                 self.removeWall(self.current_point, next_point)
             self.current_point = next_point
             self.steps += 1
-
 
     def removeWall(self, p1, p2):
         dx = p2[0] - p1[0]
